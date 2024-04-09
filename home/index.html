@@ -3,9 +3,74 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./../style.css">
 	<title>Native Plant Vouchers</title>
 </head>
 <body>
+	<template id="admin-login-template">
+		<div class="admin-login">
+			<p class="title">Admin Login</p>
+			<div class="inputs">
+				<label for="username">Username</label>
+				<input type="text" name="username" id="username">
+				<label for="password">Password</label>
+				<input type="password" name="password" id="password">
+			</div>
+			<p class="error-msg"></p>
+			<div class="submit-btn">Submit</div>
+			<div class="close-btn">&#10005;</div>
+		</div>
+	</template>
+	<nav>
+		<div class="title">
+			<img class="logo" src="https://www.brisbane.qld.gov.au/themes/bcc_theme/src/components/logo/images/logo.png" alt="BCC logo" draggable="false">
+			<p id="title-txt">Native Plant Vouchers</p>
+		</div>
+		<div class="nav-btns">
+			<div id="admin-login-btn">Admin Login</div>
+		</div>
+	</nav>
+	<main class="home-main">
+		<div class="home-info">
+			<div class="title">Data</div>
+			<div class="btns">
+				<div>Species</div>
+				<div>Participating Nurseries</div>
+			</div>
+			<div class="txt">
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque esse totam deserunt voluptate eaque, quidem deleniti perspiciatis inventore reprehenderit necessitatibus eius facere, eligendi, provident et rem maiores rerum qui odio aliquid numquam quia dolore id impedit sint. Beatae magnam ipsum dolorum fugiat, minima asperiores, aspernatur corporis quod modi consequuntur impedit.
+			</div>
+		</div>
+		<div class="index-carousel">
+			<p id="carousel-text"></p>
+			<img class="inactive" src="./img/banksia.webp" alt="banksia" draggable="false">
+			<img class="inactive" src="./img/blue_flax.webp" alt="blue_flax" draggable="false">
+			<img class="inactive" src="./img/bottle_brush.jpg" alt="bottle_brush" draggable="false">
+			<img class="inactive" src="./img/coastal_boobialla.webp" alt="coastal_boobialla" draggable="false">
+			<img class="inactive" src="./img/creeping_boobialla.jpg" alt="creeping_boobialla" draggable="false">
+			<img class="inactive" src="./img/fan_flower.jpg" alt="fan_flower" draggable="false">
+			<img class="inactive" src="./img/flame_tree.jpg" alt="flame_tree" draggable="false">
+			<img class="inactive" src="./img/golden_penda.jpeg" alt="golden_penda" draggable="false">
+			<img class="inactive" src="./img/grevillea.jpg" alt="grevillea" draggable="false">
+			<img class="inactive" src="./img/guinea_vine.jpg" alt="guinea_vine" draggable="false">
+			<img class="inactive" src="./img/honey_myrtle.jpg" alt="honey_myrtle" draggable="false">
+			<img class="inactive" src="./img/isolepis_nodosa.jpg" alt="isolepis_nodosa" draggable="false">
+			<img class="inactive" src="./img/ivory_curl_tree.jpg" alt="ivory_curl_tree" draggable="false">
+			<img class="inactive" src="./img/knobby_club_rush.jpg" alt="knobby_club_rush" draggable="false">
+			<img class="inactive" src="./img/lemon-scented_myrtle.webp" alt="lemon-scented_myrtle" draggable="false">
+			<img class="inactive" src="./img/lillypilly.jpg" alt="lillypilly" draggable="false">
+			<img class="inactive" src="./img/mat_rush.webp" alt="mat_rush" draggable="false">
+			<img class="inactive" src="./img/native_violet.webp" alt="native_violet" draggable="false">
+			<img class="inactive" src="./img/swamp_banksia.jpg" alt="swamp_banksia" draggable="false">
+			<img class="inactive" src="./img/tea_tree.webp" alt="tea_tree" draggable="false">
+			<img class="inactive" src="./img/thyme_honey_myrtle.jpg" alt="thyme_honey_myrtle" draggable="false">
+			<img class="inactive" src="./img/tuckeroo.jpg" alt="tuckeroo" draggable="false">
+			<img class="inactive" src="./img/tulipwood.jpg" alt="tulipwood" draggable="false">
+			<img class="offload" src="./img/weeping_lillypilly.webp" alt="weeping_lillypilly" draggable="false">
+			<img class="active" src="./img/westringia_fruiticosa.jpg" alt="westringia_fruiticosa" draggable="false">
+			<img class="active" src="./img/wonga-wonga_vine.jpg" alt="wonga-wonga_vine" draggable="false">
+		</div>
+	</main>
 
 	<script defer type="module" src="./home.js"></script>
 </body>
