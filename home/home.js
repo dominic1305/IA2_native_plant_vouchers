@@ -45,7 +45,7 @@ document.querySelector('#admin-login-btn').addEventListener('click', () => {
 		} else {
 			const bool = await server.request('write-credential-cache', Encryption.encode(`${username}\x00${password}`, 16));
 			if (!bool) throw new Error('unable to save credentials');
-			//TODO: redirect to admin page
+			location.assign('./../admin/admin.html');
 		}
 	});
 });

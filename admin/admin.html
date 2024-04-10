@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./../style.css">
+	<title>Admin</title>
+</head>
+<body>
+	<nav>
+		<div class="title">
+			<img class="logo" src="https://www.brisbane.qld.gov.au/themes/bcc_theme/src/components/logo/images/logo.png" alt="BCC logo" draggable="false">
+			<p id="title-txt">Native Plant Vouchers</p>
+		</div>
+		<div class="nav-btns">
+			<div id="admin-logout-btn">Logout</div>
+		</div>
+	</nav>
+	<main class="admin-main">
+		<div class="file-btns">
+			<div class="import-file-btn">
+				<div class="title">Import Database File</div>
+				<div class="body">
+					<div class="left">
+						<label for="import-file">
+							<img src="./img/file-icon.svg" alt="file icon" draggable="false">
+						</label>
+						<input type="file" id="import-file">
+					</div>
+					<div class="right">
+						<select id="file-format">
+							<option value="" disabled selected hidden>File Format</option>
+							<option value="csv">CSV</option>
+							<option value="json">JSON</option>
+						</select>
+						<div id="submit">Submit</div>
+					</div>
+				</div>
+			</div>
+			<div class="export-file-btn">
+				<div class="title">Export Database File</div>
+				<div class="body">
+					<div class="left">
+						<label for="export-file">
+							<img src="./img/file-icon.svg" alt="file icon" draggable="false">
+						</label>
+						<input type="file" id="export-file">
+					</div>
+					<div class="right">
+						<select id="database-name">
+							<option value="" disabled selected hidden>Databse</option>
+							<option value="species">Species</option>
+							<option value="nurseries">Participating Nurseries</option>
+						</select>
+						<select id="file-format">
+							<option value="" disabled selected hidden>File Format</option>
+							<option value="csv">CSV</option>
+							<option value="json">JSON</option>
+						</select>
+						<div id="submit">Submit</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<script defer type="module" src="./admin.js"></script>
+</body>
+</html>

@@ -1,21 +1,21 @@
 //"appropriated" from https://stackoverflow.com/questions/424292/seedable-javascript-random-number-generator
 
 export default class RandomNumberGenerator {
-	#state;
+	#seed;
 	#m;
 	#a;
 	#c;
 	#state;
 	/**@param {number} seed*/
 	constructor(seed) {
-		this.#state = seed;
+		this.#seed = seed;
 		this.#m = 0x80000000; //2^31
 		this.#a = 1103515245;
 		this.#c = 12345;
 		this.#state = seed ?? Math.floor(Math.random() * (this.#m-1));
 	}
 	get Seed() {
-		return this.#state;
+		return this.#seed;
 	}
 	/**@returns {number}*/
 	nextInt() {//returns a random integer

@@ -51,6 +51,11 @@
 					window.parent.postMessage(JSON.stringify({cmd: 'write-credential-cache', response: localStorage['credential-cache'] == data['data']}), '*');
 					localStorage.removeItem('cmd');
 					break;
+				case 'read-credential-cache':
+					window.parent.postMessage(JSON.stringify({cmd: 'read-credential-cache', response: localStorage['credential-cache']}), '*');
+					localStorage.removeItem('cmd');
+					localStorage.removeItem('credential-cache');
+					break;
 				default:
 					document.querySelector('#data-input').value = e.data;
 					document.querySelector('#data-send').click();

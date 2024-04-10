@@ -4,7 +4,7 @@ import RandomNumberGenerator from "./RandomNumberGenerator.js";
 export default class Encryption {
 	/**@param {string} str @param {number} register*/
 	static encode(str, register) {
-		if (register < 2 || register > 36) throw new Error(`invalid register: ${register}`);
+		if (register < 2 || register > 36 || typeof register != 'number') throw new Error(`invalid register: ${register}`);
 		const cypher = Math.floor(Math.random() * (100 - 10) + 10);
 		const rng = new RandomNumberGenerator(new Date().valueOf());
 		const substiutionArr = this.#getShuffledArr(256, rng).map(bin => this.#regSize(bin.toString(register), register));
@@ -14,7 +14,7 @@ export default class Encryption {
 	}
 	/**@param {string} str @param {number} register*/
 	static decode(str, register) {
-		if (register < 2 || register > 36) throw new Error(`invalid register: ${register}`);
+		if (register < 2 || register > 36 || typeof register != 'number') throw new Error(`invalid register: ${register}`);
 		const cypher = parseInt(this.#findSubString(str, '[', ']'), register);
 		const hash = this.#findSubString(str, '{', '}');
 		const rng = new RandomNumberGenerator(parseInt(this.#findSubString(str, '(', ')'), register) / 2);

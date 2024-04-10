@@ -199,3 +199,75 @@ nav {
 		color: black;
 	}
 }
+
+.admin-main {
+	margin-top: 10px;
+	& .file-btns {
+		width: max-content;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		& input[type="file"] {
+			display: none;
+		}
+		& > div {
+			width: max-content;
+			padding: 10px 15px;
+			border: 1px solid black;
+			& div.title {
+				width: max-content;
+				text-decoration: underline;
+				user-select: none;
+				font-size: 20px;
+				margin-bottom: 5px;
+				transform: translateX(-50%);
+				position: relative;
+				left: 50%;
+			}
+			& div.body {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+				gap: 20px;
+				align-items: center;
+				& img {
+					height: 100px;
+					cursor: pointer;
+				}
+				& .right {
+					display: flex;
+					flex-direction: column;
+					gap: 10px;
+					& select {
+						width: 160px;
+						height: 20px;
+						cursor: pointer;
+					}
+					& div#submit {
+						width: max-content;
+						user-select: none;
+						cursor: pointer;
+						transform: translateX(-50%);
+						position: relative;
+						left: 50%;
+						--width: 0px;
+						&:hover {
+							--width: 60px;
+						}
+						&::before {
+							content: '';
+							height: 2px;
+							width: var(--width);
+							transition: 100ms;
+							background-color: #006bb7;
+							transform: translateX(-50%);
+							position: absolute;
+							left: 50%;
+							top: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
+}
