@@ -25,14 +25,10 @@
 						<label for="import-file">
 							<img src="./img/file-icon.svg" alt="file icon" draggable="false">
 						</label>
-						<input type="file" id="import-file">
+						<input type="file" id="import-file" accept="text/csv, application/json">
 					</div>
 					<div class="right">
-						<select id="file-format">
-							<option value="" disabled selected hidden>File Format</option>
-							<option value="csv">CSV</option>
-							<option value="json">JSON</option>
-						</select>
+						<div id="file-name">file not selected</div>
 						<div id="submit">Submit</div>
 					</div>
 				</div>
@@ -41,10 +37,7 @@
 				<div class="title">Export Database File</div>
 				<div class="body">
 					<div class="left">
-						<label for="export-file">
-							<img src="./img/file-icon.svg" alt="file icon" draggable="false">
-						</label>
-						<input type="file" id="export-file">
+						<img id="submit" src="./img/file-icon.svg" alt="file icon" draggable="false">
 					</div>
 					<div class="right">
 						<select id="database-name">
@@ -57,7 +50,6 @@
 							<option value="csv">CSV</option>
 							<option value="json">JSON</option>
 						</select>
-						<div id="submit">Submit</div>
 					</div>
 				</div>
 			</div>

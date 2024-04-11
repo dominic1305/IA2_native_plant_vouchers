@@ -211,7 +211,6 @@ nav {
 			display: none;
 		}
 		& > div {
-			width: max-content;
 			padding: 10px 15px;
 			border: 1px solid black;
 			& div.title {
@@ -243,16 +242,23 @@ nav {
 						height: 20px;
 						cursor: pointer;
 					}
+					& div#file-name {
+						width: 160px;
+						text-wrap: nowrap;
+						user-select: none;
+						overflow: hidden;
+					}
 					& div#submit {
 						width: max-content;
 						user-select: none;
 						cursor: pointer;
+						font-size: 25px;
 						transform: translateX(-50%);
 						position: relative;
 						left: 50%;
 						--width: 0px;
 						&:hover {
-							--width: 60px;
+							--width: 80px;
 						}
 						&::before {
 							content: '';
