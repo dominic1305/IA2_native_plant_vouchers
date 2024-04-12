@@ -22,6 +22,9 @@ document.querySelector('#admin-login-btn').addEventListener('click', () => {
 	document.body.appendChild(document.querySelector('#admin-login-template').content.cloneNode(true));
 	const element = document.querySelector('.admin-login');
 	element.querySelector('.close-btn').addEventListener('click', () => { document.body.removeChild(element); });
+	element.addEventListener('keyup', (e) => {
+		if (e.key == 'Enter') element.querySelector('.submit-btn').click();
+	});
 	element.querySelector('.submit-btn').addEventListener('click', async () => {
 		try {
 			var username = String(document.querySelector('#username').value) || void function() { throw 0 }();
@@ -35,17 +38,17 @@ document.querySelector('#admin-login-btn').addEventListener('click', () => {
 		element.querySelectorAll('.inputs > input').forEach(bin => bin.style.border = '');
 
 		const bool = Boolean(await server.request('check-admin-login', {username: username, password: password}));
-		if (!bool) {
+		if (bool) {
+			const bool = await server.request('write-credential-cache', Encryption.encode(`${username}\x00${password}`, 16));
+			if (!bool) throw new Error('unable to save credentials');
+			location.assign('./../admin/admin.html');
+		} else {
 			const err = element.querySelector('.error-msg');
 			err.innerHTML = 'Invalid Credentials';
 			err.style.margin = '5px 0';
 			err.style.padding = '5px';
 			element.querySelectorAll('.inputs > input').forEach(bin => bin.value = '');
-			return;
-		} else {
-			const bool = await server.request('write-credential-cache', Encryption.encode(`${username}\x00${password}`, 16));
-			if (!bool) throw new Error('unable to save credentials');
-			location.assign('./../admin/admin.html');
+			element.querySelectorAll('.inputs > input')[0].focus();
 		}
 	});
 });
