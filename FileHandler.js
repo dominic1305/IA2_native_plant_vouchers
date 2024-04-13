@@ -6,6 +6,17 @@ export default class FileHandler {
 		this.#data = obj;
 		this.#keys = keys;
 	}
+	get Length() {
+		const arrs = Object.values(this.#data).map(bin => bin.length);
+		return arrs.reduce((a, b) => a + b) / Object.values(this.#data).length;
+	}
+	get Types() {
+		let obj = {};
+		for (const key of this.#keys) {
+			obj[key] = typeof this.#data[key][0];
+		}
+		return obj;
+	}
 	/**@returns {Promise<FileHandler>} @param {File} file*/
 	static async parseFile(file) {//wrapper function for 'getFromString'
 		let buffer;
@@ -23,7 +34,7 @@ export default class FileHandler {
 				obj[key] = [];
 			}
 			for (const line of str.split('\r\n').splice(1)) {//handle data rows
-				const dataPoints = this.#parseCSVLine(line);
+				const dataPoints = this.#tokenizeCSV(line);
 				for (let i = 0; i < dataPoints.length; i++) {
 					obj[keys[i]].push(dataPoints[i]);
 				}
@@ -40,7 +51,7 @@ export default class FileHandler {
 				}
 			}
 		} else if (format == 'xml') {
-			const rows = this.#parseXMLRow(str.split('\r\n').slice(1, str.split('\r\n').length-1).map(bin => String(bin.replaceAll('\t', ''))));
+			const rows = this.#TokenizeXML(str.split('\r\n').slice(1, str.split('\r\n').length-1).map(bin => String(bin.replaceAll('\t', ''))));
 			for (const row of rows[0]) {//init keys
 				const key = row.split('>')[0].slice(1).replaceAll('_', ' ');
 				keys.push(key);
@@ -57,20 +68,24 @@ export default class FileHandler {
 			if (obj['latitude'].length != obj['longitude'].length) throw new Error('invalid latitude or longitude length');
 			obj['location'] = [];
 			for (let i = 0; i < obj['latitude'].length; i++) {
-				obj['location'].push(this.translateLatLongToHex(obj['latitude'][i], obj['longitude'][i]));
+				obj['location'].push(this.translateLatLongToLong(obj['latitude'][i], obj['longitude'][i]));
 			}
 			delete obj['latitude'];
 			delete obj['longitude'];
 			keys.splice(keys.indexOf('latitude'), 2, 'location');
 		} else if (keys.includes('latitude') || keys.includes('longitude')) throw new Error('missing either latitude or longitude');
 
+		if (keys.includes('phone number')) {//translate to numbers
+			obj['phone number'] = obj['phone number'].map(bin => Number(bin.replaceAll(' ', '')));
+		}
+
 		return new FileHandler(obj, keys);
 	}
-	/**@returns {string[]} @param {string} line*/
-	static #parseCSVLine(line) {
+	/**@param {string} line*/
+	static #tokenizeCSV(line) {
 		let isInString = false;
 		let arr = [];
-		let buffer = "";
+		let buffer = '';
 		for (const char of line.split('')) {
 			if (!isInString && char == '"') {//open "
 				isInString = true;
@@ -98,9 +113,9 @@ export default class FileHandler {
 		return arr;
 	}
 	/**@param {string[]} lines*/
-	static #parseXMLRow(lines) {
-		let arr = [];
+	static #TokenizeXML(lines) {
 		let isInTag = false;
+		let arr = [];
 		let buffer = [];
 		for (const line of lines) {
 			if (!isInTag && line == '<row>') {//open tag
@@ -118,16 +133,16 @@ export default class FileHandler {
 		return arr;
 	}
 	/**@param {number} lat @param {number} long*/
-	static translateLatLongToHex(lat, long) {//wrapper for 'floatToBinary'
+	static translateLatLongToLong(lat, long) {//wrapper for 'floatToBinary'
 		lat = this.#floatToBinary(lat);
 		long = this.#floatToBinary(long);
-		return parseInt(lat + long, 2).toString(16);
+		return BigInt(parseInt(lat + long, 2));
 	}
-	/**@returns {{lat: number, long: number}} @param {string} hex*/
-	static translateHexToLatLong(hex) {//wrapper for 'binaryToFloat'
-		hex = parseInt(hex, 16).toString(2)
-		const lat = this.#binaryToFloat(hex.split('').slice(0, 32).join(''));
-		const long = this.#binaryToFloat(hex.split('').slice(32).join(''));
+	/**@returns {{lat: number, long: number}} @param {number} int*/
+	static translateIntToLatLong(int) {//wrapper for 'binaryToFloat'
+		const bits = int.toString(2);
+		const lat = this.#binaryToFloat(bits.slice(0, 32));
+		const long = this.#binaryToFloat(bits.slice(32));
 		return { lat: lat, long: long };
 	}
 	/**@param {number} float*/
@@ -152,10 +167,6 @@ export default class FileHandler {
 		}
 		return float32 * sign;
 	}
-	get Length() {
-		const arrs = Object.values(this.#data).map(bin => bin.length);
-		return arrs.reduce((a, b) => a + b) / Object.values(this.#data).length;
-	}
 	/**@param {'csv' | 'json' | 'xml'} format @param {string} filename*/
 	export(format, filename) {
 		let arr = [];
@@ -175,7 +186,7 @@ export default class FileHandler {
 			const locationIdx = arr[0].indexOf('location');
 			arr[0].splice(locationIdx, 1, ...['latitude', 'longitude']);
 			for (let i = 1; i < arr.length; i++) {//data rows
-				const { lat, long } = FileHandler.translateHexToLatLong(arr[i][locationIdx]);
+				const { lat, long } = FileHandler.translateIntToLatLong(Number(arr[i][locationIdx]));
 				arr[i].splice(locationIdx, 1, ...[lat, long]);
 			}
 		}
@@ -196,11 +207,13 @@ export default class FileHandler {
 			arr = `<data>\r\n${arr.join('\r\n')}\r\n</data>`;
 		} else throw new Error('invalid file format');
 
-		const file = new Blob([arr]);
-		const element = document.createElement('a');
-		element.href = URL.createObjectURL(file);
-		element.download = `${filename}.${format}`;
-		element.click();
-		URL.revokeObjectURL(element.href);
+		console.log(arr);
+
+		// const file = new Blob([arr]);
+		// const element = document.createElement('a');
+		// element.href = URL.createObjectURL(file);
+		// element.download = `${filename}.${format}`;
+		// element.click();
+		// URL.revokeObjectURL(element.href);
 	}
 }
