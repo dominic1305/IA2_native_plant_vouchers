@@ -40,10 +40,23 @@ document.querySelector('#admin-logout-btn').addEventListener('click', () => {//l
 
 document.querySelector('.import-file-btn div#submit').addEventListener('click', async () => {//import file
 	try {
-		/**@type {File?}*/ const fileReference = document.querySelector('.import-file-btn input[type="file"]').files[0];
-		if (fileReference == null) throw new Error('no file provided');
-		const file = await FileHandler.parseFile(fileReference);
-		console.log(file);
+		const { fileReference, DB_name } = getFileInfo();
+		let file = await FileHandler.parseFile(fileReference, DB_name);
+		/**@type {string[]}*/ const DB_keys = JSON.parse(await server.request('get-DB-signature', DB_name)).map(bin => bin.replaceAll('_', ' '));
+
+		if (DB_keys.some((_, i, arr) => !arr.includes(file.Keys[i]))) throw new Error('invalid key file format');
+
+		switch (await getImportMethod(file)) {
+			case 'replace': {//drop existing table & upload a new one
+				server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.exportToString('json'), DB_name: DB_name});
+				break;
+			}
+			case 'extend': {//drop existing table & upload a conjoined one
+				file = file.add(FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${DB_name}`), 'json', DB_name)); //old + new file
+				server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.exportToString('json'), DB_name: DB_name});
+				break;
+			}
+		}
 	} catch (err) {
 		if (err.message == 'no file provided') {
 			document.querySelector('.import-file-btn #file-name').style.outline = '2px solid #ff0000ff';
@@ -55,10 +68,49 @@ document.querySelector('.import-file-btn div#submit').addEventListener('click', 
 					return clearInterval(interval)
 				}
 			}, 10);
+		} else if (err.message == 'database to override not selected') {
+			document.querySelector('.import-file-btn #database-name').style.outline = '2px solid #ff0000ff';
+			let opacity = 255;
+			const interval = setInterval(() => {
+				document.querySelector('.import-file-btn #database-name').style.outline = `2px solid #ff0000${(opacity -= 5).toString(16).padStart(2, '0')}`;
+				if (opacity <= 0) {
+					document.querySelector('.import-file-btn #database-name').style.outline = '';
+					return clearInterval(interval)
+				}
+			}, 10);
 		} else alert(`[ERROR] ${err.message}`);
 	}
 });
 
 document.querySelector('.import-file-btn input[type="file"]').addEventListener('change', () => {
 	document.querySelector('.import-file-btn #file-name').innerHTML = document.querySelector('.import-file-btn input[type="file"]').files[0].name;
+});
+
+/**@returns {{fileReference: File, DB_name: string}}*/
+function getFileInfo() {
+	/**@type {File?}*/ const fileReference = document.querySelector('.import-file-btn input[type="file"]').files[0];
+	const DB_name = document.querySelector('.import-file-btn #database-name').value;
+	if (fileReference == null) throw new Error('no file provided');
+	if (DB_name == '') throw new Error('database to override not selected');
+	return { fileReference: fileReference, DB_name: DB_name };
+}
+
+/**@returns {Promise<'replace' | 'extend'>} @param {FileHandler} file*/
+async function getImportMethod(file) {
+	document.querySelector('.import-method-modal .file-display-content').innerHTML = `${file.exportToString('xml').replaceAll('\t', '    ')}`;
+	document.querySelector('.import-method-modal').showModal();
+	let buffer;
+	await new Promise((resolve) => {
+		document.querySelector('.import-method-modal .footer').addEventListener('click', (e) => {
+			if (e.target.dataset['method'] != null) return resolve(e.target.dataset['method']);
+		});
+	}).then(bin => buffer = bin);
+	document.querySelector('.import-method-modal').close();
+	return buffer;
+}
+
+document.querySelector('.import-method-modal div.close-btn').addEventListener('click', () => document.querySelector('.import-method-modal').close());
+
+document.querySelector('.export-file-btn').addEventListener('click', () => {//export file
+	throw new Error('not implemented');
 });

@@ -7,6 +7,19 @@
 	<title>Admin</title>
 </head>
 <body>
+	<dialog class="import-method-modal">
+		<div class="header">
+			<div>Select an Importing Method</div>
+			<div class="close-btn">&#10005;</div>
+		</div>
+		<div class="body">
+			<textarea readonly class="file-display-content"></textarea>
+		</div>
+		<div class="footer">
+			<div data-method="replace">Replace</div>
+			<div data-method="extend">Extend</div>
+		</div>
+	</dialog>
 	<nav>
 		<div class="title">
 			<img class="logo" src="https://www.brisbane.qld.gov.au/themes/bcc_theme/src/components/logo/images/logo.png" alt="BCC logo" draggable="false">
@@ -29,6 +42,12 @@
 					</div>
 					<div class="right">
 						<div id="file-name">file not selected</div>
+						<select id="database-name">
+							<option value="" disabled selected hidden>Database</option>
+							<option value="species">Species</option>
+							<option value="nurseries">Participating Nurseries</option>
+							<option value="wards">Ward Offices</option>
+						</select>
 						<div id="submit">Submit</div>
 					</div>
 				</div>
@@ -41,9 +60,10 @@
 					</div>
 					<div class="right">
 						<select id="database-name">
-							<option value="" disabled selected hidden>Databse</option>
+							<option value="" disabled selected hidden>Database</option>
 							<option value="species">Species</option>
 							<option value="nurseries">Participating Nurseries</option>
+							<option value="wards">Ward Offices</option>
 						</select>
 						<select id="file-format">
 							<option value="" disabled selected hidden>File Format</option>
