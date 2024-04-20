@@ -5,6 +5,13 @@ export default class FileHandler {
 	get Keys() {
 		return Object.freeze(this.#keys);
 	}
+	get Data() {
+		let obj = {};
+		for (const key of this.#keys) {
+			obj[key] = Object.freeze(this.#data[key]);
+		}
+		return Object.freeze(obj);
+	}
 	get Length() {
 		const arrs = Object.values(this.#data).map(bin => bin.length);
 		return arrs.reduce((a, b) => a + b) / Object.values(this.#data).length;

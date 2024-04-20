@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./../style.css">
+	<title>Vouchers</title>
+</head>
+<body>
+	<nav>
+		<div class="title">
+			<img class="logo" src="https://www.brisbane.qld.gov.au/themes/bcc_theme/src/components/logo/images/logo.png" alt="BCC logo" draggable="false">
+			<p id="title-txt">Native Plant Vouchers</p>
+		</div>
+		<div class="nav-btns">
+			<div id="admin-login-btn">Place Voucher</div>
+		</div>
+	</nav>
+	<main style="margin-top: 20px;">
+		<div class="voucher-controls">
+			<select id="database-selecter">
+				<option value="" disabled hidden selected>Select Database</option>
+				<option value="species">Species</option>
+				<option value="nurseries">Participating Nurseries</option>
+				<option value="wards">Ward Offices</option>
+			</select>
+			<div class="filter-controls-btn inactive">Apply Filter</div>
+		</div>
+		<div class="data-displayer"></div>
+	</main>
+	<script defer type="module" src="./vouchers.js"></script>
+</body>
+</html>
