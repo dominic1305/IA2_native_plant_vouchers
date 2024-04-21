@@ -5,21 +5,29 @@ export default class DataTableManager {
 	#tableElement;
 	#btnElement;
 	#filter;
+	#tableIdx;
+	static #idxSkip = 10;
 	get #NewFilter() {
 		const element = document.querySelector('.filter-controller-container');
 		if (element == null) throw new Error('modal doesn\'t exist');
 
 		const filter = {};
 		for (const key of this.#data.Keys) {
-			const obj = {};
+			const obj = { checked: false, options: null };
 
 			obj['checked'] = element.querySelector(`div.row[data-key="${key}"] input[type="checkbox"]`).checked;
 
-			const arr = [];
-			for (const selectBox of element.querySelectorAll(`div.row[data-key="${key}"] div.option-select input`)) {//get non-unique selection info
-				arr.push({ checked: selectBox.checked, value: selectBox.dataset['value']});
+			if (this.#data.Types[key] == 'string') {//populate options
+				obj['options'] = Array.from(new Set(this.#data.Data[key])).map((bin) => { return { checked: true, value: bin } });
+				if (element.querySelector(`div.row[data-key="${key}"] div.option-select`) != null) {
+					obj['options'] = Array.from(new Set(this.#data.Data[key])).map((bin) => {
+						return {
+							checked: element.querySelector(`div.row[data-key="${key}"] div.option-select input[data-value="${bin}"]`).checked,
+							value: bin
+						};
+					});
+				}
 			}
-			obj['options'] = arr;
 
 			filter[key] = obj;
 		}
@@ -32,6 +40,7 @@ export default class DataTableManager {
 		this.#tableElement = tableElement;
 		this.#btnElement = btnElement;
 		this.#filter = filterInfo;
+		this.#tableIdx = 0;
 	}
 	/**@param {FileHandler} file @param {HTMLDivElement} tableLocation @param {HTMLDivElement} btnLocation*/
 	static getManager(file, tableLocation, btnLocation) {
@@ -47,15 +56,18 @@ export default class DataTableManager {
 
 		const manager = new DataTableManager(file, tableLocation, btnLocation, obj);
 		manager.#initListeners();
-		// manager.#display();
+		manager.#display();
 
 		return manager
+	}
+	/**@param {number} number @param {number} max*/
+	static #clamp(number, max) {
+		return (number > max) ? max : number;
 	}
 	#initListeners() {
 		this.#btnElement.onclick = () => {
 			const element = this.#generateFilterModal();
-
-			document.body.appendChild(element);
+			this.#btnElement.parentElement.appendChild(element);
 
 			for (const row of element.querySelectorAll('.row')) {
 				row.querySelector('input[type="checkbox"]').addEventListener('click', () => {
@@ -74,20 +86,21 @@ export default class DataTableManager {
 					} else {
 						row.querySelector('.option-select').classList.add('inactive');
 						for (const box of row.querySelectorAll('.option-select input[type="checkbox"]')) {
-							box.checked = false;
+							box.checked = true;
 						}
 					}
 				});
 			}
 
 			element.querySelector('div.title > p.exit').addEventListener('click', () => {//close modal
-				document.body.removeChild(element);
+				this.#btnElement.parentElement.removeChild(element);
 			});
 
-			element.querySelector('.submit').addEventListener('click', () => {//TODO: generate data table here
+			element.querySelector('.submit').addEventListener('click', () => {
 				this.#filter = this.#NewFilter;
-				document.body.removeChild(element);
-				console.log(this.#filter);
+				this.#btnElement.parentElement.removeChild(element);
+				this.#tableElement.innerHTML = '';
+				this.#display();
 			});
 		}
 	}
@@ -120,7 +133,100 @@ export default class DataTableManager {
 		return parent;
 	}
 	#display() {//show table with filter accounted for
-		throw new Error('not implemented');
+		const scopeController = `<div class="scope-controller">
+			<div id="left" ${(this.#tableIdx <= 0) ? 'class="inactive"' : ''}>&#10092;</div>
+			<div id="scope">${this.#tableIdx}-${DataTableManager.#clamp(this.#tableIdx + DataTableManager.#idxSkip, this.#data.Length)}</div>
+			<div id="right" ${(this.#tableIdx + DataTableManager.#idxSkip >= this.#data.Length) ? 'class="inactive"' : ''}>&#10093;</div>
+		</div>`;
+
+		let table = '<table class="data-display">'; //start table
+
+		table += '<thead><tr>'; //start head
+		for (const key of this.#data.Keys) {
+			if (!this.#filter[key].checked) continue;
+			table += `<th>${key}</th>`;
+		}
+		table += '</tr></thead>'; //end head
+
+		table += '<tbody>'; //start body
+
+		rowLoop: for (let i = this.#tableIdx; i < this.#tableIdx + DataTableManager.#idxSkip && i < this.#data.Length; i++) {
+			table += `<tr data-idx="${i}">`; //start row
+
+			itemLoop: for (const key of this.#data.Keys) {
+				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) {
+					table = table.slice(0, table.length - `<tr data-idx="${i}">`.length);
+					continue rowLoop;
+				} else if (!this.#filter[key].checked) continue itemLoop;
+
+				switch (key) {
+					case 'location': {
+						const { lat, long } = FileHandler.translateLongToLatLong(this.#data.Data[key][i]);
+						table += `<td><button id="location" data-lat="${lat}" data-long="${long}">Show Map</button></td>`;
+						break;
+					}
+					case 'phone number':
+					case 'fax': {
+						let val = String(this.#data.Data[key][i]).padStart(10, '0').split('').map((bin, i) => (i == 2 || i == 6) ? ` ${bin}` : bin).join('');
+						table += `<td>${val}</td>`;
+						break;
+					}
+					default: {
+						table += `<td>${this.#data.Data[key][i]}</td>`;
+					}
+				}
+			}
+
+			table += '</tr>'; //end row
+		}
+		table += '</tbody>'; //end body
+
+		this.#tableElement.innerHTML = scopeController + table + '</table>'; //concat & add to DOM
+
+		this.#tableElement.querySelectorAll('button#location').forEach(bin => {//has locations
+			bin.addEventListener('click', () => {
+				const { lat, long } = bin.dataset;
+				this.#createMapModal(lat, long);
+			});
+		});
+
+		this.#tableElement.querySelector('.scope-controller > div#left').addEventListener('click', () => {//previous page
+			if (this.#tableElement.querySelector('.scope-controller > div#left').classList.contains('inactive')) return;
+			this.#tableIdx -= DataTableManager.#idxSkip;
+			this.#tableElement.innerHTML = '';
+			this.#display();
+		});
+
+		this.#tableElement.querySelector('.scope-controller > div#right').addEventListener('click', () => {//next page
+			if (this.#tableElement.querySelector('.scope-controller > div#right').classList.contains('inactive')) return;
+			this.#tableIdx += DataTableManager.#idxSkip;
+			this.#tableElement.innerHTML = '';
+			this.#display();
+		});
+	}
+	/**@param {number} lat @param {number} long*/
+	#createMapModal(lat, long) {
+		const container = document.createElement('dialog');
+		container.className = 'map-container-modal';
+
+		container.innerHTML += '<div class="close-btn">&#10005;</div>';
+		container.innerHTML += `<iframe src="https://maps.google.com/maps?q=${lat},${long}&hl=en&z=14&amp;output=embed"></iframe>`;
+		container.innerHTML += '<div class="disclaimer">This is only a approximate loaction</div>';
+
+		document.body.appendChild(container);
+		container.showModal();
+
+		document.body.style.cursor = 'progress';
+		container.style.cursor = 'progress';
+
+		container.querySelector('iframe').addEventListener('load', () => {//finished loading
+			container.style.cursor = 'auto';
+			document.body.style.cursor = 'auto';
+		});
+
+		container.querySelector('.close-btn').addEventListener('click', () => {
+			document.body.removeChild(container);
+		});
 	}
 	dispose() {//destructor | remove listeners
 		this.#btnElement.classList.add('inactive');

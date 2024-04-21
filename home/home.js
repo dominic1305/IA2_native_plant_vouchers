@@ -54,5 +54,5 @@ document.querySelector('#admin-login-btn').addEventListener('click', () => {
 });
 
 document.querySelector('.apply-voucher-btn').addEventListener('click', () => {//redirect to data page
-	location.assign('./../vouchers/vouchers.html');
+	location.assign('./../data_view/data_view.html');
 });

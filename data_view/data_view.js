@@ -14,5 +14,4 @@ document.querySelector('#database-selecter').addEventListener('change', async (e
 
 	const file = FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${e.target.value}`), 'json', e.target.value);
 	tableManager = DataTableManager.getManager(file, document.querySelector('.data-displayer'), document.querySelector('.filter-controls-btn'));
-	console.log(tableManager);
 });

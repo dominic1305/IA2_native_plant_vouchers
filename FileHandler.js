@@ -169,7 +169,7 @@ export default class FileHandler {
 		return BigInt(parseInt(lat + long, 2));
 	}
 	/**@returns {{lat: number, long: number}} @param {number} int*/
-	static translateIntToLatLong(int) {//wrapper for 'binaryToFloat'
+	static translateLongToLatLong(int) {//wrapper for 'binaryToFloat'
 		const bits = int.toString(2);
 		const lat = this.#binaryToFloat(bits.slice(0, 32));
 		const long = this.#binaryToFloat(bits.slice(32));
@@ -225,7 +225,7 @@ export default class FileHandler {
 			const locationIdx = arr[0].indexOf('location');
 			arr[0].splice(locationIdx, 1, ...['latitude', 'longitude']);
 			for (let i = 1; i < arr.length; i++) {//data rows
-				const { lat, long } = FileHandler.translateIntToLatLong(Number(arr[i][locationIdx]));
+				const { lat, long } = FileHandler.translateLongToLatLong(Number(arr[i][locationIdx]));
 				arr[i].splice(locationIdx, 1, ...[lat, long]);
 			}
 		}
