@@ -1,12 +1,14 @@
 import FileHandler from "./FileHandler.js";
 
 export default class DataTableManager {
+	static #idxSkip = 10;
 	#data;
 	#tableElement;
 	#btnElement;
 	#filter;
 	#tableIdx;
-	static #idxSkip = 10;
+	/**@type {'table' | 'cards'}*/ #displayType;
+	#voucherable = false;
 	get #NewFilter() {
 		const element = document.querySelector('.filter-controller-container');
 		if (element == null) throw new Error('modal doesn\'t exist');
@@ -46,7 +48,7 @@ export default class DataTableManager {
 		}
 		return count;
 	}
-	/**@private @param {FileHandler} data @param {HTMLDivElement} tableElement @param {HTMLDivElement} btnElement @param {{}} filterInfo */
+	/**@private @param {FileHandler} data @param {HTMLDivElement} tableElement @param {HTMLDivElement} btnElement @param {{}} filterInfo*/
 	constructor(data, tableElement, btnElement, filterInfo) {
 		this.#data = data;
 		this.#tableElement = tableElement;
@@ -54,8 +56,8 @@ export default class DataTableManager {
 		this.#filter = filterInfo;
 		this.#tableIdx = 0;
 	}
-	/**@param {FileHandler} file @param {HTMLDivElement} tableLocation @param {HTMLDivElement} btnLocation*/
-	static getManager(file, tableLocation, btnLocation) {
+	/**@param {FileHandler} file @param {HTMLDivElement} tableLocation @param {HTMLDivElement} btnLocation @param {string} displayType*/
+	static getManager(file, tableLocation, btnLocation, displayType) {
 		const obj = {};
 		for (const key of file.Keys) {
 			obj[key] = { checked: true, options: null };
@@ -68,9 +70,47 @@ export default class DataTableManager {
 
 		const manager = new DataTableManager(file, tableLocation, btnLocation, obj);
 		manager.#initListeners();
-		manager.#display();
+
+		if (location.href.split('/')[4].split('.')[0] == 'data_view') manager.#voucherable = true; //on data_view page, can place vouchers
+
+		switch (displayType) {
+			case "cards": manager.displayCards(); break;
+			case "table": manager.displayTable(); break;
+			default: throw new Error(`[ERROR] invalid display type`);
+		}
 
 		return manager
+	}
+	/**@param {string} name*/
+	static getImgRefName(name) {//this is disgustingly hard-coded, please for the love of god fix this!
+		switch (name) {
+			case 'Coastal boobialla':				return 'coastal_boobialla.webp';
+			case 'Creeping boobialla':				return 'creeping_boobialla.jpg';
+			case 'Fan flower':					 	return 'fan_flower.jpg';
+			case 'Native violet':					return 'native_violet.webp';
+			case 'Blue flax':						return 'blue_flax.webp';
+			case 'Knobby club rush':				return 'knobby_club_rush.jpg';
+			case 'Mat rush':						return 'mat_rush.webp';
+			case 'Guinea vine':						return 'guinea_vine.jpg';
+			case 'Wonga-wonga vine':				return 'wonga-wonga_vine.jpg';
+			case 'Bottlebrush':						return 'bottle_brush.jpg';
+			case 'Coastal rosemary':				return 'westringia_fruiticosa.jpg';
+			case 'Honey myrtle \'Claret Tops\'':	return 'honey_myrtle.jpg';
+			case 'Swamp banksia':					return 'swamp_banksia.jpg';
+			case 'Tea tree':						return 'tea_tree.webp'
+			case 'Thyme honey myrtle':				return 'thyme_honey_myrtle.jpg';
+			case 'Banksia':							return 'banksia.webp';
+			case 'Grevillea':						return 'grevillea.jpg';
+			case 'Lillypilly':						return 'lillypilly.jpg';
+			case 'Flame Tree':						return 'flame_tree.jpg';
+			case 'Golden penda':					return 'golden_penda.jpeg';
+			case 'Ivory curl tree':					return 'ivory_curl_tree.jpg';
+			case 'Lemon-scented myrtle':			return 'lemon-scented_myrtle.webp';
+			case 'Tuckeroo':						return 'tuckeroo.jpg';
+			case 'Tulipwood':						return 'tulipwood.jpg';
+			case 'Weeping lillypilly':				return 'weeping_lillypilly.webp';
+			default: throw new Error(`invalid img reference: ${name}`);
+		}
 	}
 	#initListeners() {
 		this.#btnElement.onclick = () => {
@@ -121,7 +161,7 @@ export default class DataTableManager {
 				this.#btnElement.parentElement.removeChild(element);
 				this.#tableElement.innerHTML = '';
 				this.#tableIdx = 0;
-				this.#display();
+				(this.#displayType == 'table') ? this.displayTable() : this.displayCards();
 			});
 		}
 	}
@@ -136,7 +176,7 @@ export default class DataTableManager {
 
 			row += `<label id="key-select" data-key="${key}"><input type="checkbox" ${(checked) ? 'checked' : ''}>${key}</label>`;
 
-			//must have an options array, and the the options array must be at least 70% unique
+			//must have an options array, and the the options array must be at most 70% unique
 			if (options != null && options.length / this.#data.Length <= 0.7) {
 				row += `<div data-key="${key}" class="option-select ${(checked) ? '' : 'inactive'}">`; //start options
 
@@ -154,7 +194,9 @@ export default class DataTableManager {
 
 		return parent;
 	}
-	#display() {//show table with filter accounted for
+	displayTable() {//show table with filter accounted for
+		this.#displayType = 'table';
+
 		const scopeController = `<div class="scope-controller">
 			<div id="left" ${(this.#tableIdx <= 0) ? 'class="inactive"' : ''}>&#10092;</div>
 			<div id="page-number">${Math.floor(this.#tableIdx / DataTableManager.#idxSkip) + 1}</div>
@@ -178,7 +220,6 @@ export default class DataTableManager {
 
 			itemLoop: for (const key of this.#data.Keys) {
 				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) {
-					row = '';
 					continue rowLoop;
 				} else if (!this.#filter[key].checked) continue itemLoop;
 
@@ -195,7 +236,7 @@ export default class DataTableManager {
 						break;
 					}
 					default: {
-						const txt = this.#data.Data[key][i].split('').map(bin => (bin.charCodeAt() <= 127) ? bin : '').join(''); //remove non-ascii characters
+						const txt = this.#data.Data[key][i].split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
 						row += `<td>${txt}</td>`;
 					}
 				}
@@ -219,14 +260,67 @@ export default class DataTableManager {
 			if (this.#tableElement.querySelector('.scope-controller > div#left').classList.contains('inactive')) return;
 			this.#tableIdx -= DataTableManager.#idxSkip;
 			this.#tableElement.innerHTML = '';
-			this.#display();
+			(this.#displayType == 'table') ? this.displayTable() : this.displayCards();
 		});
 
 		this.#tableElement.querySelector('.scope-controller > div#right').addEventListener('click', () => {//next page
 			if (this.#tableElement.querySelector('.scope-controller > div#right').classList.contains('inactive')) return;
 			this.#tableIdx += DataTableManager.#idxSkip;
 			this.#tableElement.innerHTML = '';
-			this.#display();
+			(this.#displayType == 'table') ? this.displayTable() : this.displayCards();
+		});
+	}
+	displayCards() {
+		this.#displayType = 'cards';
+
+		let container = '<div class="data-displayer-cards">';
+
+		cardLoop: for (let i = 0; i < this.#data.Length; i++) {
+			let card = `<div class="card" data-idx="${i}">`;
+
+			if (this.#data.Name == 'species') {//add plant imgs
+				const comName = this.#data.Data['species'][i].split('(')[0].split('').map(bin => (bin.charCodeAt() < 128) ? bin : '').join('').replace('.', '');
+				card += `<img class="plant-img" src="./../img/${DataTableManager.getImgRefName(comName.trim())}" draggable="false">`;
+			}
+
+			itemLoop: for (const key of this.#data.Keys) {
+				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) {
+					continue cardLoop;
+				} else if (!this.#filter[key].checked) continue itemLoop;
+
+				switch (key) {
+					case 'location': {
+						const { lat, long } = FileHandler.translateLongToLatLong(this.#data.Data[key][i]);
+						card += `<button id="location" data-lat="${lat}" data-long="${long}">Show Map</button>`;
+						break;
+					}
+					case 'phone number':
+					case 'fax': {
+						const txt = String(this.#data.Data[key][i]).padStart(10, '0').split('').map((bin, i) => (i == 2 || i == 6) ? ` ${bin}` : bin).join('');
+						card += `<p>${txt}</p>`;
+						break;
+					}
+					default: {
+						const txt = this.#data.Data[key][i].split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
+						card += `<p>${txt}</p>`;
+					}
+				}
+			}
+
+			if (this.#voucherable && this.#data.Name == 'species') {//add voucher btns
+				card += '<div class="add-to-voucher-btn">Add to Voucher</div>';
+			}
+
+			container += card + '</div>';
+		}
+
+		this.#tableElement.innerHTML = container + '</div>'; //concat & add to DOM
+
+		this.#tableElement.querySelectorAll('button#location').forEach(bin => {//has locations
+			bin.addEventListener('click', () => {
+				const { lat, long } = bin.dataset;
+				this.#createMapModal(lat, long);
+			});
 		});
 	}
 	/**@param {number} lat @param {number} long*/

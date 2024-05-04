@@ -12,6 +12,9 @@ export default class FileHandler {
 		}
 		return Object.freeze(obj);
 	}
+	get Name() {
+		return this.#DB_name;
+	}
 	get Length() {
 		const arrs = Object.values(this.#data).map(bin => bin.length);
 		return arrs.reduce((a, b) => a + b) / Object.values(this.#data).length;

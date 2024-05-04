@@ -18,11 +18,15 @@
 	</nav>
 	<main style="margin-top: 20px;">
 		<div class="voucher-controls">
+			<div class="format-controls">
+				<img class="inactive" src="./../img/cards-icon.png" alt="cards" draggable="false">
+				<img class="inactive" src="./../img/table-icon.png" alt="table" draggable="false">
+			</div>
 			<select id="database-selecter">
 				<option value="" disabled hidden selected>Select Database</option>
-				<option value="species">Species</option>
-				<option value="nurseries">Participating Nurseries</option>
-				<option value="wards">Ward Offices</option>
+				<option value="species" data-default="cards">Species</option>
+				<option value="nurseries" data-default="table">Participating Nurseries</option>
+				<option value="wards" data-default="table">Ward Offices</option>
 			</select>
 			<div class="filter-controls-btn inactive">Apply Filter</div>
 		</div>
