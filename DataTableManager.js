@@ -9,6 +9,9 @@ export default class DataTableManager {
 	#tableIdx;
 	/**@type {'table' | 'cards'}*/ #displayType;
 	#voucherable = false;
+	static get IdxSkip() {
+		return Object.freeze(this.#idxSkip);
+	}
 	get #NewFilter() {
 		const element = document.querySelector('.filter-controller-container');
 		if (element == null) throw new Error('modal doesn\'t exist');
@@ -48,6 +51,15 @@ export default class DataTableManager {
 		}
 		return count;
 	}
+	get DisplayType() {
+		return this.#displayType;
+	}
+	get Data() {
+		return this.#data.Data;
+	}
+	get DataName() {
+		return this.#data.Name;
+	}
 	/**@private @param {FileHandler} data @param {HTMLDivElement} tableElement @param {HTMLDivElement} btnElement @param {{}} filterInfo*/
 	constructor(data, tableElement, btnElement, filterInfo) {
 		this.#data = data;
@@ -82,7 +94,7 @@ export default class DataTableManager {
 		return manager
 	}
 	/**@param {string} name*/
-	static getImgRefName(name) {//this is disgustingly hard-coded, please for the love of god fix this!
+	static getImgRefName(name) {//God, please forgive me for what I'm about to do
 		switch (name) {
 			case 'Coastal boobialla':				return 'coastal_boobialla.webp';
 			case 'Creeping boobialla':				return 'creeping_boobialla.jpg';

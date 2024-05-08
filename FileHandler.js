@@ -58,41 +58,49 @@ export default class FileHandler {
 		let keys = [];
 		let obj = {};
 
-		if (format == 'csv') {
-			keys = str.split('\r\n')[0].split(',').map(bin => bin.toLowerCase());
-			for (const key of keys) {//init keys
-				obj[key] = [];
-			}
-			for (const line of str.split('\r\n').splice(1)) {//handle data rows
-				const dataPoints = this.#tokenizeCSV(line);
-				for (let i = 0; i < dataPoints.length; i++) {
-					obj[keys[i]].push(dataPoints[i]);
+		switch (format) {
+			case 'csv': {
+				keys = str.split('\r\n')[0].split(',').map(bin => bin.toLowerCase());
+				for (const key of keys) {//init keys
+					obj[key] = [];
 				}
-			}
-		} else if (format == 'json') {
-			const data = JSON.parse(str);
-			keys = data[0];
-			for (const key of keys) {//init keys
-				obj[key] = [];
-			}
-			for (const line of data.slice(1)) {//handle data row
-				for (let i = 0; i < line.length; i++) {
-					obj[keys[i]].push(line[i]);
+				for (const line of str.split('\r\n').splice(1)) {//handle data rows
+					const dataPoints = this.#tokenizeCSV(line);
+					for (let i = 0; i < dataPoints.length; i++) {
+						obj[keys[i]].push(dataPoints[i]);
+					}
 				}
+				break;
 			}
-		} else if (format == 'xml') {
-			const rows = this.#TokenizeXML(str.split('\r\n').slice(1, str.split('\r\n').length-1).map(bin => String(bin.replaceAll('\t', ''))));
-			for (const row of rows[0]) {//init keys
-				const key = row.split('>')[0].slice(1).replaceAll('_', ' ');
-				keys.push(key);
-				obj[key] = [];
-			}
-			for (const row of rows) {//handle data row
-				for (let i = 0; i < row.length; i++) {
-					obj[keys[i]].push(row[i].split('>')[1].split('<')[0]);
+			case 'json': {
+				const data = JSON.parse(str);
+				keys = data[0];
+				for (const key of keys) {//init keys
+					obj[key] = [];
 				}
+				for (const line of data.slice(1)) {//handle data row
+					for (let i = 0; i < line.length; i++) {
+						obj[keys[i]].push(line[i]);
+					}
+				}
+				break;
 			}
-		} else throw new Error(`invalid file format {${format}}`);
+			case 'xml': {
+				const rows = this.#TokenizeXML(str.split('\r\n').slice(1, str.split('\r\n').length-1).map(bin => String(bin.replaceAll('\t', ''))));
+				for (const row of rows[0]) {//init keys
+					const key = row.split('>')[0].slice(1).replaceAll('_', ' ');
+					keys.push(key);
+					obj[key] = [];
+				}
+				for (const row of rows) {//handle data row
+					for (let i = 0; i < row.length; i++) {
+						obj[keys[i]].push(row[i].split('>')[1].split('<')[0]);
+					}
+				}
+				break;
+			}
+			default: throw new Error(`invalid file format {${format}}`);
+		}
 
 		if (keys.includes('latitude') && keys.includes('longitude')) {//turn latitude & longitude into a single 64bit hex number
 			if (obj['latitude'].length != obj['longitude'].length) throw new Error('invalid latitude or longitude length');

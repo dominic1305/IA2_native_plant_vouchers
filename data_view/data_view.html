@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="./../style.css">
 	<title>Vouchers</title>
 </head>
-<body>
+<body data-page="data_view">
 	<nav>
 		<div class="title">
 			<img class="logo" src="https://www.brisbane.qld.gov.au/themes/bcc_theme/src/components/logo/images/logo.png" alt="BCC logo" draggable="false">
@@ -32,6 +32,19 @@
 		</div>
 		<div class="data-displayer"></div>
 	</main>
+	<div class="voucher-menu" data-shown="0">
+		<input type="text" id="address" placeholder="Address">
+		<select id="pref-contact">
+			<option value="" disabled selected hidden>Prefered Contact Method</option>
+			<option value="email">Email</option>
+			<option value="phone">Phone Number</option>
+		</select>
+		<input type="email" id="email" placeholder="Email">
+		<input type="text" id="phone-number" placeholder="Phone Number">
+		<input type="text" id="rate-number" placeholder="Rate Account Number">
+		<div id="see-selected-plants-btn">See Selected Plants</div>
+		<div class="submit-btn">Submit</div>
+	</div>
 	<script defer type="module" src="./data_view.js"></script>
 </body>
 </html>

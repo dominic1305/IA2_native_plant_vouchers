@@ -429,6 +429,10 @@ nav {
 	}
 }
 
+body[data-page="data_view"] {
+	overflow-y: hidden;
+}
+
 .data-displayer {
 	height: max-content;
 	max-height: 80vh;
@@ -534,16 +538,86 @@ table.data-display {
 	}
 }
 
+.voucher-menu {
+	width: 100vw;
+	height: max-content;
+	box-sizing: border-box;
+	padding: 75px 100px;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	transition: 250ms;
+	background-color: white;
+	outline: 2px solid black;
+	position: absolute;
+	bottom: -50vh;
+	& * {
+		font-size: 20px;
+	}
+	& div.submit-btn {
+		cursor: pointer;
+		user-select: none;
+		background-color: #006bb7;
+		color: white;
+		padding: 5px 10px;
+		outline: 2px solid black;
+		border-radius: 10px;
+		margin-left: auto;
+	}
+	& div#see-selected-plants-btn {
+		cursor: pointer;
+		user-select: none;
+		font-size: 18px;
+		background-color: #006bb7;
+		color: white;
+		padding: 5px 5px;
+		outline: 1px solid black;
+		border-radius: 10px;
+	}
+	& div.submit-btn:active, div#see-selected-plants-btn:active {
+		transform: scale(0.9);
+	}
+}
+
+.voucher-plants-modal {
+	padding-top: 5px;
+	border-radius: 15px;
+	& td#remove {
+		cursor: pointer;
+		user-select: none;
+		transform: translateY(-10%);
+	}
+	& div#close-modal {
+		font-size: 20px;
+		text-align: right;
+		cursor: pointer;
+		user-select: none;
+		position: relative;
+	}
+}
+
 @media (max-width: 600px) {
 	.data-displayer {
 		height: auto;
 	}
 	.data-displayer-cards {
+		margin-bottom: 50px;
 		flex-direction: column;
 		flex-wrap: nowrap;
 		gap: 20px;
 		& .card {
 			width: 80vw;
+		}
+	}
+	.voucher-menu {
+		padding: 10px 0;
+		flex-direction: column;
+		gap: 5px;
+		& div.submit-btn {
+			margin-left: 0;
 		}
 	}
 }
