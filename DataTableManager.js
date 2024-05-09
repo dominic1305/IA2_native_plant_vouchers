@@ -121,7 +121,7 @@ export default class DataTableManager {
 			case 'Tuckeroo':						return 'tuckeroo.jpg';
 			case 'Tulipwood':						return 'tulipwood.jpg';
 			case 'Weeping lillypilly':				return 'weeping_lillypilly.webp';
-			default: throw new Error(`invalid img reference: ${name}`);
+			default:								throw new Error(`invalid img reference: ${name}`);
 		}
 	}
 	#initListeners() {
@@ -231,11 +231,16 @@ export default class DataTableManager {
 			let row = `<tr data-idx="${i}">`; //start row
 
 			itemLoop: for (const key of this.#data.Keys) {
-				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) {
-					continue rowLoop;
-				} else if (!this.#filter[key].checked) continue itemLoop;
+				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) continue rowLoop;
+				if (!this.#filter[key].checked) continue itemLoop;
 
 				switch (key) {
+					case 'plant 1':
+					case 'plant 2': {
+						const txt = key.split('').map((bin, i) => (i == 0) ? bin.toUpperCase() : bin).join('');
+						row += `<td><button id="plant" data-idx="${this.#data.Data[key][i]}">View ${txt}</button></td>`;
+						break;
+					}
 					case 'location': {
 						const { lat, long } = FileHandler.translateLongToLatLong(this.#data.Data[key][i]);
 						row += `<td><button id="location" data-lat="${lat}" data-long="${long}">Show Map</button></td>`;
@@ -247,8 +252,14 @@ export default class DataTableManager {
 						row += `<td>${txt}</td>`;
 						break;
 					}
+					case 'placement time': {
+						let date = new Date(Number(this.#data.Data[key][i]));
+						let dateStr = `${date.getDate()} / ${date.getMonth()} / ${date.getFullYear()}`;
+						row += `<td>${dateStr}</td>`;
+						break;
+					}
 					default: {
-						const txt = this.#data.Data[key][i].split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
+						const txt = String(this.#data.Data[key][i]).split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
 						row += `<td>${txt}</td>`;
 					}
 				}
@@ -295,12 +306,21 @@ export default class DataTableManager {
 				card += `<img class="plant-img" src="./../img/${DataTableManager.getImgRefName(comName.trim())}" draggable="false">`;
 			}
 
+			let skip = false;
 			itemLoop: for (const key of this.#data.Keys) {
-				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) {
-					continue cardLoop;
-				} else if (!this.#filter[key].checked) continue itemLoop;
+				if (this.#filter[key].options != null && !this.#filter[key].options.find(bin => bin.value == this.#data.Data[key][i]).checked) continue cardLoop;
+				if (!this.#filter[key].checked) continue itemLoop;
+				if (skip) { skip = false; continue itemLoop; }
 
 				switch (key) {
+					case 'plant 1':
+					case 'plant 2': {
+						const plant_1_btn = `<button style="cursor: pointer;" data-idx="${this.#data.Data[key][i]}">View Plant 1</button>`;
+						const plant_2_btn = `<button style="cursor: pointer;" data-idx="${this.#data.Data[this.#data.Keys[this.#data.Keys.indexOf(key)+1]][i]}">View Plant 2</button>`;
+						card += `<div style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 10px;">${plant_1_btn}${plant_2_btn}</div>`;
+						skip = true;
+						break;
+					}
 					case 'location': {
 						const { lat, long } = FileHandler.translateLongToLatLong(this.#data.Data[key][i]);
 						card += `<button id="location" data-lat="${lat}" data-long="${long}">Show Map</button>`;
@@ -312,8 +332,14 @@ export default class DataTableManager {
 						card += `<p>${txt}</p>`;
 						break;
 					}
+					case 'placement time': {
+						let date = new Date(Number(this.#data.Data[key][i]));
+						let dateStr = `${date.getDate()} / ${date.getMonth()} / ${date.getFullYear()}`;
+						card += `<p>${dateStr}</p>`;
+						break;
+					}
 					default: {
-						const txt = this.#data.Data[key][i].split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
+						const txt = String(this.#data.Data[key][i]).split('').map(bin => (bin.charCodeAt() <= 127) ? bin : ' ').join(''); //remove non-ascii characters
 						card += `<p>${txt}</p>`;
 					}
 				}

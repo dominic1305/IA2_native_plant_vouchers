@@ -36,7 +36,7 @@
 				<div class="body">
 					<div class="left">
 						<label for="import-file">
-							<img src="./img/file-icon.svg" alt="file icon" draggable="false">
+							<img src="./../img/file-icon.svg" alt="file icon" draggable="false">
 						</label>
 						<input type="file" id="import-file" accept="text/csv, application/json, text/xml">
 					</div>
@@ -56,7 +56,7 @@
 				<div class="title">Export Database File</div>
 				<div class="body">
 					<div class="left">
-						<img id="submit" src="./img/file-icon.svg" alt="file icon" draggable="false">
+						<img id="submit" src="./../img/file-icon.svg" alt="file icon" draggable="false">
 					</div>
 					<div class="right">
 						<select id="database-name">
@@ -74,6 +74,23 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="admin-data-displayer">
+			<div class="voucher-controls">
+				<div class="format-controls">
+					<img class="inactive" src="./../img/cards-icon.png" alt="cards" draggable="false">
+					<img class="inactive" src="./../img/table-icon.png" alt="table" draggable="false">
+				</div>
+				<select id="database-selecter">
+					<option value="" disabled hidden selected>Select Database</option>
+					<option value="species" data-default="cards">Species</option>
+					<option value="nurseries" data-default="table">Participating Nurseries</option>
+					<option value="wards" data-default="table">Ward Offices</option>
+					<option value="vouchers" data-default="table">Vouchers</option>
+				</select>
+				<div class="filter-controls-btn inactive">Apply Filter</div>
+			</div>
+			<div class="data-displayer"></div>
 		</div>
 	</main>
 	<script defer type="module" src="./admin.js"></script>

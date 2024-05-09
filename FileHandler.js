@@ -60,7 +60,7 @@ export default class FileHandler {
 
 		switch (format) {
 			case 'csv': {
-				keys = str.split('\r\n')[0].split(',').map(bin => bin.toLowerCase());
+				keys = str.split('\r\n')[0].split(',').map(bin => bin.toLowerCase().replaceAll('_', ' '));
 				for (const key of keys) {//init keys
 					obj[key] = [];
 				}
@@ -74,7 +74,7 @@ export default class FileHandler {
 			}
 			case 'json': {
 				const data = JSON.parse(str);
-				keys = data[0];
+				keys = data[0].map(bin => bin.toLowerCase().replaceAll('_', ' '));
 				for (const key of keys) {//init keys
 					obj[key] = [];
 				}
@@ -114,10 +114,10 @@ export default class FileHandler {
 		} else if (keys.includes('latitude') || keys.includes('longitude')) throw new Error('missing either latitude or longitude');
 
 		if (keys.includes('phone number')) {//translate to numbers
-			obj['phone number'] = obj['phone number'].map(bin => Number(bin.replaceAll(' ', '')));
+			obj['phone number'] = obj['phone number'].map(bin => Number(String(bin).replaceAll(' ', '')));
 		}
 		if (keys.includes('fax')) {//translate to numbers
-			obj['fax'] = obj['fax'].map(bin => Number(bin.replaceAll(' ', '')));
+			obj['fax'] = obj['fax'].map(bin => Number(String(bin).replaceAll(' ', '')));
 		}
 
 		return new FileHandler(obj, keys, DB_name);

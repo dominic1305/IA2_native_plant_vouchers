@@ -11,6 +11,10 @@ document.body.onload = async () => {
 	server = await ServerHandler.getConnection();
 }
 
+document.querySelector('nav > div.title').addEventListener('click', () => {//go back home
+	location.assign('./../home/index.html');
+});
+
 document.querySelector('#database-selecter').addEventListener('change', async (e) => {
 	if (tableManager != null) tableManager = tableManager.dispose();
 	if (dataObserver != null) dataObserver.disconnect();
@@ -157,7 +161,10 @@ document.querySelector('.voucher-menu div.submit-btn').addEventListener('click',
 	try {
 		const info = Object.fromEntries(Array.from(document.querySelectorAll('.voucher-menu > input, .voucher-menu > select')).map(bin => {//get voucher menu info
 			if (bin.value == '') throw bin.id;
-			return [ bin.id.replaceAll('-', '_'), String(bin.value) ];
+
+			if (bin.id == 'phone-number' || bin.id == 'rate-number') return [ bin.id.replaceAll('-', '_'), Number(bin.value.replaceAll(' ', '')) ]; //TODO: test this
+
+			return [ bin.id.replaceAll('-', '_'), bin.value ];
 		}));
 
 		for (let i = 0; i < voucher.length; i++) {//add plant indecies
@@ -166,17 +173,16 @@ document.querySelector('.voucher-menu div.submit-btn').addEventListener('click',
 
 		info['placement_time'] = new Date().valueOf();
 
-		console.log(info); //TODO: implement server integration, send to database
-	} catch (elemIdx) {
-		if (elemIdx instanceof Error) throw elemIdx; //encountered an actual error, throw higher
+		console.log(JSON.stringify(info)); //TODO: implement server integration, send to database
+	} catch (elemId) {
+		if (elemId instanceof Error) throw elemId; //encountered an actual error, throw higher
 
-		const errElem = document.querySelector(`.voucher-menu > #${elemIdx}`);
+		const errElem = document.querySelector(`.voucher-menu > #${elemId}`);
 		errElem.style.outline = '3px solid #ff0000';
 
 		let opacity = 0xff;
 		let interval = setInterval(() => {//error animation
-			opacity -= 2;
-			errElem.style.outline = `3px solid #ff0000${opacity.toString(16).padStart(2, '0')}`;
+			errElem.style.outline = `3px solid #ff0000${(opacity -= 2).toString(16).padStart(2, '0')}`;
 			if (opacity <= 0) return clearInterval(interval);
 		}, 10);
 	}

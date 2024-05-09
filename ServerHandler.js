@@ -18,15 +18,14 @@ export default class ServerHandler {
 			});
 			document.body.appendChild(iframe);
 			setTimeout(() => { return reject('[ERROR] unable to get server connection'); }, 1000);
-		}).then(() => {//connection was established
-			buffer = new ServerHandler(iframe);
-		}).catch(msg => alert(msg));
+		}).then(() => buffer = new ServerHandler(iframe)).catch(msg => alert(msg));
 
 		return buffer;
 	}
 	/**@returns {Promise<any>} @param {string} cmd @param {any} data*/
 	async request(cmd, data) {
 		let buffer;
+
 		await new Promise((resolve, reject) => {
 			window.addEventListener('message', (e) => {
 				const data = JSON.parse(e.data);
@@ -34,9 +33,12 @@ export default class ServerHandler {
 				if (String(data['response']).includes('[ERROR]')) return reject(data['response']);
 				return resolve(data['response']);
 			}, {once: true});
-			this.#iframe.contentWindow.postMessage(JSON.stringify({cmd: cmd, data: data}), '*');
+
+			this.#iframe.contentWindow.postMessage(JSON.stringify({cmd: cmd, data: data}, (_, val) => (typeof val == 'bigint') ? val.toString() : val), '*');
+
 			setTimeout(() => { return reject('[ERROR] server response timeout'); }, 1000);
 		}).then(response => buffer = response).catch(msg => alert(msg));
+
 		return buffer;
 	}
 	/**@returns {Promise<boolean>}*/
