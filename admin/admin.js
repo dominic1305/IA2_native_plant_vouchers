@@ -64,8 +64,7 @@ document.querySelector('.import-file-btn div#submit').addEventListener('click', 
 				break;
 			}
 			case 'extend': {//drop existing table & upload a conjoined one
-				// file = file.add(FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${DB_name}`), 'json', DB_name)); //old + new file
-				file = file.add(FileHandler.parseString(await server.request('query_data', DB_name), 'json', DB_name)); //TEST: replace with top line
+				file = file.add(FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${DB_name}`), 'json', DB_name)); //old + new file
 				server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.Data, DB_name: DB_name});
 				break;
 			}
@@ -122,8 +121,7 @@ document.querySelector('.export-file-btn').addEventListener('click', () => {//ex
 document.querySelector('#database-selecter').addEventListener('change', async (e) => {
 	if (tableManager != null) tableManager = tableManager.dispose();
 
-	// const file = FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${e.target.value}`), 'json', e.target.value);
-	const file = FileHandler.parseString(await server.request('query_data', e.target.value), 'json', e.target.value); //TEST: replace with top line
+	const file = FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${e.target.value}`), 'json', e.target.value);
 	const tableLocation = document.querySelector('.data-displayer');
 	const btnLocation = document.querySelector('.filter-controls-btn');
 	const displayType = e.target.options[e.target.selectedIndex].dataset['default'];
@@ -164,7 +162,35 @@ function addVoucherDisplayBtns() {
 			const modal = document.createElement('dialog');
 			modal.className = 'plant-viewer-modal';
 
-			// const plantInfo = await server.request('query_data', `SELECT * FROM vouchers WHERE idx = ${idx}`); //TODO: implement server integration
+			modal.innerHTML += '<div class="modal-close">&#10006;</div>';
+
+			const plantInfo = FileHandler.parseString(await server.request('query_data', `SELECT * FROM vouchers WHERE idx = ${idx}`), 'json', 'vouchers');
+
+			let table = "<table><tbody><tr>";
+
+			for (const key of plantInfo.Keys) {//init keys
+				table += `<th>${key}</th>`;
+			}
+			table += '</tr>';
+
+			for (let i = 0; i < plantInfo.Length; i++) {//plant info
+				table += '<tr>';
+
+				for (const key of plantInfo.Keys) {
+					table += `<td>${plantInfo.Data[key][i]}</td>`;
+				}
+
+				table += '</tr>';
+			}
+
+			modal.innerHTML += table + '</tbody></table>';
+
+			document.body.appendChild(modal);
+			modal.showModal();
+
+			modal.querySelector('.modal-close').addEventListener('click', () => {//close modal
+				document.body.removeChild(modal);
+			});
 		});
 	}
 }

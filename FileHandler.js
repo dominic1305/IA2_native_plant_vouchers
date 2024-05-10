@@ -39,7 +39,7 @@ export default class FileHandler {
 			}
 			buffer.push(`${key.replaceAll(' ', '_')} ${FileHandler.#getSQLType(this.Types[key], maxLength)}`);
 		}
-		return `CREATE TABLE ${this.#DB_name} (idx int UNSIGNED, ${buffer.join(', ')});`; //TODO: 'idx' is for when plant selection is implemented
+		return `CREATE TABLE ${this.#DB_name} (${(this.#DB_name == 'species') ? 'idx int UNSIGNED, ' : ''}${buffer.join(', ')});`;
 	}
 	/**@private @param {{}} obj @param {string[]} keys @param {string} DB_name*/
 	constructor(obj, keys, DB_name) {

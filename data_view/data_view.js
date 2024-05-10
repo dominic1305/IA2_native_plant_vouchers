@@ -19,8 +19,7 @@ document.querySelector('#database-selecter').addEventListener('change', async (e
 	if (tableManager != null) tableManager = tableManager.dispose();
 	if (dataObserver != null) dataObserver.disconnect();
 
-	// const file = FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${e.target.value}`), 'json', e.target.value);
-	const file = FileHandler.parseString(await server.request('query_data', e.target.value), 'json', e.target.value); //TEST: replace with top line
+	const file = FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${e.target.value}`), 'json', e.target.value);
 	const tableLocation = document.querySelector('.data-displayer');
 	const btnLocation = document.querySelector('.filter-controls-btn');
 	const displayType = e.target.options[e.target.selectedIndex].dataset['default'];
@@ -162,7 +161,7 @@ document.querySelector('.voucher-menu div.submit-btn').addEventListener('click',
 		const info = Object.fromEntries(Array.from(document.querySelectorAll('.voucher-menu > input, .voucher-menu > select')).map(bin => {//get voucher menu info
 			if (bin.value == '') throw bin.id;
 
-			if (bin.id == 'phone-number' || bin.id == 'rate-number') return [ bin.id.replaceAll('-', '_'), Number(bin.value.replaceAll(' ', '')) ]; //TODO: test this
+			if (bin.id == 'phone-number' || bin.id == 'rate-number') return [ bin.id.replaceAll('-', '_'), Number(bin.value.replaceAll(' ', '')) ];
 
 			return [ bin.id.replaceAll('-', '_'), bin.value ];
 		}));
