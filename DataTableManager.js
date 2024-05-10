@@ -246,6 +246,7 @@ export default class DataTableManager {
 						row += `<td><button id="location" data-lat="${lat}" data-long="${long}">Show Map</button></td>`;
 						break;
 					}
+					case 'rate number':
 					case 'phone number':
 					case 'fax': {
 						const txt = String(this.#data.Data[key][i]).padStart(10, '0').split('').map((bin, i) => (i == 2 || i == 6) ? ` ${bin}` : bin).join('');
@@ -254,7 +255,7 @@ export default class DataTableManager {
 					}
 					case 'placement time': {
 						let date = new Date(Number(this.#data.Data[key][i]));
-						let dateStr = `${date.getDate()} / ${date.getMonth()} / ${date.getFullYear()}`;
+						let dateStr = `${String(date.getDate()).padStart(2, '0')} / ${String(date.getMonth()+1).padStart(2, '0')} / ${date.getFullYear()}`;
 						row += `<td>${dateStr}</td>`;
 						break;
 					}

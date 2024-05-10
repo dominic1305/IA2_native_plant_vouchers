@@ -634,3 +634,22 @@ table.data-display {
 		}
 	}
 }
+
+.notification-container {
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 10px;
+	transform: translateY(-100%);
+	position: absolute;
+	bottom: 2%;
+	left: 2%;
+	& p {
+		pointer-events: none;
+		margin: 0;
+		padding: 5px;
+		font-size: 20px;
+		background-color: white;
+		outline: 2px solid black;
+		border-radius: 10px;
+	}
+}

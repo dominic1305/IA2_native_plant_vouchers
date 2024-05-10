@@ -1,6 +1,7 @@
 import ServerHandler from "./../ServerHandler.js";
 import DataTableManager from "./../DataTableManager.js";
 import FileHandler from "./../FileHandler.js";
+import Notification from "../Notification.js";
 
 /**@type {ServerHandler}*/ let server;
 /**@type {DataTableManager?}*/ let tableManager;
@@ -173,7 +174,9 @@ document.querySelector('.voucher-menu div.submit-btn').addEventListener('click',
 
 		info['placement_time'] = new Date().valueOf();
 
-		console.log(JSON.stringify(info)); //TODO: implement server integration, send to database
+		Notification.notify('Voucher Added successfully');
+
+		toggleVoucherMenu(false);
 	} catch (elemId) {
 		if (elemId instanceof Error) throw elemId; //encountered an actual error, throw higher
 

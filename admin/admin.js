@@ -2,6 +2,7 @@ import ServerHandler from "./../ServerHandler.js";
 import Encryption from "./../Encryption.js";
 import FileHandler from "./../FileHandler.js";
 import DataTableManager from "./../DataTableManager.js";
+import Notification from "../Notification.js";
 
 /**@type {ServerHandler}*/ let server;
 /**@type {DataTableManager?} */ let tableManager;
@@ -60,16 +61,17 @@ document.querySelector('.import-file-btn div#submit').addEventListener('click', 
 
 		switch (await getImportMethod(file)) {
 			case 'replace': {//drop existing table & upload a new one
-				server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.Data, DB_name: DB_name});
+				// server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.Data, DB_name: DB_name});
 				break;
 			}
 			case 'extend': {//drop existing table & upload a conjoined one
 				// file = file.add(FileHandler.parseString(await server.request('query_data', `SELECT * FROM ${DB_name}`), 'json', DB_name)); //old + new file
 				file = file.add(FileHandler.parseString(await server.request('query_data', DB_name), 'json', DB_name)); //TEST: replace with top line
-				server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.Data, DB_name: DB_name});
+				// server.request('replace-table', {createStmt: file.CreateTableStmt, data: file.Data, DB_name: DB_name});
 				break;
 			}
 		}
+		Notification.notify('File Uploaded successfully');
 	} catch (elemSelector) {
 		if (elemSelector instanceof Error) throw elemSelector; //encountered an actual error, throw higher
 
@@ -115,8 +117,12 @@ async function getImportMethod(file) {
 	return buffer;
 }
 
-document.querySelector('.export-file-btn').addEventListener('click', () => {//export file
-	throw new Error('not implemented');
+document.querySelector('.export-file-btn img#submit').addEventListener('click', async () => {//export file
+	const db = document.querySelector('.export-file-btn #database-name').value;
+	const format = document.querySelector('.export-file-btn #file-format').value
+
+	const file = FileHandler.parseString(await server.request('query_data', db), 'json', db); //TEST: replace with top line
+	file.exportToFile(format);
 });
 
 document.querySelector('#database-selecter').addEventListener('change', async (e) => {
